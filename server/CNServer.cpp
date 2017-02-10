@@ -2,6 +2,7 @@
 #include "User.h"
 #include "FilesManager.h"
 #include "external_dependencies/json.hpp"
+#include "File.h"
 #include <glog/logging.h>
 
 const std::string db_name = "/home/cristi/computer_networks/colaborative_notepad/server/db/cn.sql";
@@ -17,17 +18,16 @@ void CNServer::start_server()
     while (true)
     {
 
-        FilesManager fmng(db_name);
         User usr(db_name);
 
         CNSocket cnclient = sock.cnaccept();
 
-        std::thread client_thread(&CNServer::client_handler, this, cnclient, usr, fmng);
+        std::thread client_thread(&CNServer::client_handler, this, cnclient, usr);
         client_thread.detach();
     }
  }
 
-void CNServer::client_handler(CNSocket cnsock, User usr, FilesManager fmng)
+void CNServer::client_handler(CNSocket cnsock, User usr)
 {
     LOG(INFO) << "Waiting for a message from a client";
 
@@ -78,7 +78,7 @@ void CNServer::client_handler(CNSocket cnsock, User usr, FilesManager fmng)
             LOG(INFO) << "[SERVER REQUESTED FILES FOR]"
                       << username;
 
-            std::vector<std::string> files = fmng.get_user_files(username);
+            std::vector<std::string> files = File::get_user_files(db_name,username);
             for (auto file : files)
             {
                 cnsock.send_message("FILE_OK");

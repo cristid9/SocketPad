@@ -16,7 +16,7 @@ private:
     static const int server_port = 3131;
     static const long server_addr = INADDR_ANY;
 
-    void client_handler(CNSocket cnsock, User usr, FilesManager fmng);
+    void client_handler(CNSocket cnsock, User usr);
 
 public:
 
