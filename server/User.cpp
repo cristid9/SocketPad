@@ -62,4 +62,22 @@ bool User::check_password(std::string username, std::string password) const
     return false;
 }
 
+static unsigned int User::get_id(std::string db_pth, std::string username)
+{
+    session sql(sqlite3, "dbname=" + db_pth);
+
+    unsigned int id;
+
+    sql << "SELECT id FROM user WHERE username=:username",
+        use(username), into(id);
+
+    LOG(INFO) << "[DB ACCESS]"
+              << " Retrieved id for "
+              << username
+              << " with value "
+              << id;
+    return id;
+}
+
+
 

@@ -10,7 +10,6 @@
 #include <soci/soci.h>
 
 using namespace soci;
-using namespace std;
 
 class User
 {
@@ -52,6 +51,15 @@ public:
      * @return true if it exists
      */
     bool load(std::string username);
+
+    /**
+     * @brief Retrieved the user's id from the data base.
+     *
+     * @param db_pth Path to the sqlile file.
+     * @param The targeted user.
+     * @return The id of the user in the database.
+     */
+    static unsigned int get_id(std::string db_pth, std::string username);
 };
 
 #endif //SERVER_USER_H
