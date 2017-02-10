@@ -68,21 +68,3 @@ static void FilesManager::add_user_directory(std::string username)
 FilesManager::FilesManager()
 {
 }
-
-std::vector<std::string> FilesManager::get_user_files(std::string username)
-{
-    session sql(sqlite3, "dbname=" + db_path);
-
-    int creator_id;
-
-    sql << "select id from User where username=:username",
-        use(username), into(creator_id);
-
-    std::vector<std::string> files(100);
-
-    sql << "select name from File where creator_id=:creator_id",
-        use(creator_id), into(files);
-
-    return files;
-}
-

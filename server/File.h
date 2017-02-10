@@ -61,7 +61,7 @@ public:
      * @param username The targeted user.
      * @return A container with the file names created or edited by this user.
      */
-    static std::vector<std::string> get_user_files(std::string username);
+    static std::vector<std::string> get_user_files(std::string db_path, std::string username);
 };
 
 
