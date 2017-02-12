@@ -16,9 +16,16 @@ class User
 private:
     std::string username;
     std::string db_path;
+    unsigned int id;
 
 public:
-    User(std::string pth);
+    /**
+     * @brief Manages the user-related actions
+     *
+     * @param pth Path to the `SQLite` file.
+     * @param username The username of this user.
+     */
+    User(std::string pth, std::string username);
 
     /**
      * Inserts a new user in to the database
@@ -26,7 +33,7 @@ public:
      * @param username The username of the newly created user
      * @param password The password of the newly created user
      */
-    void create(std::string username, std::string password);
+    static void create(std::string db_path, std::string username, std::string password);
 
     /**
      * Retrieves the files created by this user or the files to which
@@ -37,20 +44,22 @@ public:
     std::vector<std::string> get_files() const;
 
     /**
-     * Checks if the password for this user is right.
+     * @brief Checks if the password for this user is right.
      *
      * @param password The candidate password.
+     * @param db_path The path to the `SQLite` database.
      * @return true if this is the matching password for this user.
      */
-    bool check_password(std::string username, std::string password) const;
+    static bool check_password(std::string db_path, std::string username, std::string password);
 
     /**
-     * Checks if this user exits.
+     * @brief Checks if this user exits.
      *
-     * @param username
+     * @param username The targeted user.
+     * @param db_path The path to the `SQLite` database.
      * @return true if it exists
      */
-    bool load(std::string username);
+    static bool load(std::string db_path, std::string username);
 
     /**
      * @brief Retrieved the user's id from the data base.
@@ -60,6 +69,20 @@ public:
      * @return The id of the user in the database.
      */
     static unsigned int get_id(std::string db_pth, std::string username);
+
+    /**
+     * @brief Getter for the `username` field.
+     *
+     * @return Returns the `username` stored in the current instance.
+     */
+    std::string get_username() const;
+
+    /**
+     * @brief Getter for the `id` field.
+     *
+     * @return Returns the `id` of the current instance.
+     */
+    unsigned int get_id() const;
 };
 
 #endif //SERVER_USER_H

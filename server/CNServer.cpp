@@ -18,22 +18,19 @@ void CNServer::start_server()
 
     while (true)
     {
-
-        User usr(db_name);
-
         CNSocket cnclient = sock.cnaccept();
 
-        std::thread client_thread(&CNServer::client_handler, this, cnclient, usr);
+        std::thread client_thread(&CNServer::client_handler, this, cnclient);
         client_thread.detach();
     }
  }
 
-void CNServer::client_handler(CNSocket cnsock, User usr)
+void CNServer::client_handler(CNSocket cnsock)
 {
     LOG(INFO) << "Waiting for a message from a client";
 
     std::string msg;
-    std::string session_username;
+    User *session_user = nullptr;
 
     while (true)
     {
@@ -52,7 +49,7 @@ void CNServer::client_handler(CNSocket cnsock, User usr)
 
             LOG(INFO) << "[DEBUG CLIENT_HANDLER]" << password;
 
-            if (!usr.load(username)) {
+            if (!User::load(db_name, username)) {
                 json answer = {{"action", "REGISTER_EXISTS"}};
                 cnsock.send_message(answer.dump());
             }
@@ -60,7 +57,7 @@ void CNServer::client_handler(CNSocket cnsock, User usr)
             {
                 json answer = {{"action", "REGISTER_OK"}};
                 cnsock.send_message(answer.dump());
-                usr.create(username, password);
+                User::create(db_name, username, password);
             }
         }
         else if (client_request["action"].get<std::string>() == "LOGIN")
@@ -68,7 +65,7 @@ void CNServer::client_handler(CNSocket cnsock, User usr)
             std::string username = client_request["username"].get<std::string>();
             std::string password = client_request["password"].get<std::string>();
 
-            if (usr.check_password(username, password))
+            if (User::check_password(db_name, username, password))
             {
                 json answer = { {"action", "LOGIN_OK"} };
                 cnsock.send_message(answer.dump());
@@ -79,7 +76,7 @@ void CNServer::client_handler(CNSocket cnsock, User usr)
                 cnsock.send_message(answer.dump());
             }
 
-            session_username = username;
+            session_user = new User(db_name, username);
         }
         else if (client_request["action"].get<std::string>() == "LIST_FILES")
         {
@@ -110,7 +107,7 @@ void CNServer::client_handler(CNSocket cnsock, User usr)
         }
         else if (client_request["action"].get<std::string>() == "CREATE_FILE")
         {
-            FilesManager::create_empty_file(session_username,
+            FilesManager::create_empty_file(session_user->get_username(),
                 client_request["filename"].get<std::string>());
 
             json answer = {{"action", "FILE_CREATED_OK"}};
