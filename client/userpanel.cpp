@@ -3,6 +3,9 @@
 #include "global_objs.h"
 #include <QStandardItem>
 #include <QStandardItemModel>
+#include <QDir>
+#include <QInputDialog>
+#include <QDebug>
 
 UserPanel::UserPanel(QWidget *parent) :
     QWidget(parent),
@@ -11,6 +14,11 @@ UserPanel::UserPanel(QWidget *parent) :
     ui->setupUi(this);
     this->parent = parent;
 
+    load_files();
+}
+
+void UserPanel::load_files()
+{
     std::vector<std::string> files = fm.get_user_files(sm.get_username());
 
     QStandardItemModel *listModel = new QStandardItemModel();
@@ -26,6 +34,18 @@ UserPanel::UserPanel(QWidget *parent) :
     }
 
     this->ui->listView->setModel(listModel);
+
+}
+
+
+void UserPanel::reload_files()
+{
+    QStandardItemModel *listModel = new QStandardItemModel();
+
+    this->ui->listView->setModel(listModel);
+
+    // clear the list box
+    load_files();
 }
 
 // fuck, man plictisit
@@ -45,4 +65,24 @@ void UserPanel::on_pushButton_2_clicked()
     this->ui->label_2->hide();
     this->ui->pushButton->hide();
     this->ui->pushButton_2->hide();
+}
+
+void UserPanel::on_pushButton_3_clicked()
+{
+    // display a pop-up, get new files name, tell the server to create it, yada yada...
+
+    qInfo() << QString("[CREATE FILE] create new file");
+
+    bool ok;
+    QString filename = QInputDialog::getText(this, tr("Create a new file"),
+                                         tr("Insert file name here: "), QLineEdit::Normal,
+                                         QDir::home().dirName(), &ok);
+
+
+
+    // now tell the server about your accomplishemnt
+
+    fm.create_new_file(filename.toUtf8().constData());
+
+    reload_files();
 }

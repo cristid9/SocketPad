@@ -15,14 +15,18 @@ class UserPanel : public QWidget
 public:
     explicit UserPanel(QWidget *parent = 0);
     ~UserPanel();
+    void reload_files();
 
 private slots:
     void on_pushButton_2_clicked();
+
+    void on_pushButton_3_clicked();
 
 private:
     Ui::UserPanel *ui;
     QWidget *parent;
     FileEdit *editFile;
+    void load_files();
 };
 
 #endif // USERPANEL_H

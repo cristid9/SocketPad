@@ -33,6 +33,7 @@ void CNServer::client_handler(CNSocket cnsock, User usr)
     LOG(INFO) << "Waiting for a message from a client";
 
     std::string msg;
+    std::string session_username;
 
     while (true)
     {
@@ -77,6 +78,8 @@ void CNServer::client_handler(CNSocket cnsock, User usr)
                 json answer = { {"action", "LOGIN_FAIL"} };
                 cnsock.send_message(answer.dump());
             }
+
+            session_username = username;
         }
         else if (client_request["action"].get<std::string>() == "LIST_FILES")
         {
@@ -103,6 +106,14 @@ void CNServer::client_handler(CNSocket cnsock, User usr)
 
             json answer = {{"action", "FILES_DONE"}};
 
+            cnsock.send_message(answer.dump());
+        }
+        else if (client_request["action"].get<std::string>() == "CREATE_FILE")
+        {
+            FilesManager::create_empty_file(session_username,
+                client_request["filename"].get<std::string>());
+
+            json answer = {{"action", "FILE_CREATED_OK"}};
             cnsock.send_message(answer.dump());
         }
     }

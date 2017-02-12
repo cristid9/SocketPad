@@ -22,6 +22,13 @@ public:
      * @return a vector of file names.
      */
     std::vector<std::string> get_user_files(std::string username);
+
+    /**
+     * @brief create_new_file Tell the server to create a new file on it's storage.
+     * @param filename The name of the newly created file.
+     * @return `true` if the file was create successfully, `false` otherwise.
+     */
+    bool create_new_file(std::string filename);
 };
 
 #endif // FILESMANAGER_H

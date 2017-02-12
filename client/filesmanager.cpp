@@ -50,3 +50,24 @@ std::vector<std::string> FilesManager::get_user_files(string username)
 
     return files;
 }
+
+bool FilesManager::create_new_file(std::string filename)
+{
+    json request = {
+        {"action", "CREATE_FILE"},
+        {"filename", filename.c_str()}
+    };
+
+    clsock.write_msg(request.dump());
+
+    json answer = json::parse(clsock.read_msg());
+
+    if (answer["action"].get<std::string>() == "FILE_CREATED_OK")
+    {
+        // here you should reload the list box with the file names
+
+        return true;
+    }
+
+    return false;
+}
