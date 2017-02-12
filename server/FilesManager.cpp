@@ -11,14 +11,14 @@
 
 using namespace soci;
 
-static std::string FilesManager::storage_path = nullptr;
+std::string FilesManager::storage_path = "";
 
-static void FilesManager::load_values(std::string storage_pth)
+void FilesManager::load_values(std::string storage_pth)
 {
     FilesManager::storage_path = storage_pth;
 }
 
-static std::string FilesManager::create_empty_file(std::string username, std::string filename)
+std::string FilesManager::create_empty_file(std::string username, std::string filename)
 {
 
     std::string file_path = storage_path + "/" + username + "/" + filename;
@@ -36,7 +36,7 @@ static std::string FilesManager::create_empty_file(std::string username, std::st
     return file_path;
 }
 
-static bool FilesManager::check_file_exists(std::string username, std::string filename)
+bool FilesManager::check_file_exists(std::string username, std::string filename)
 {
     std::string candidate_path = storage_path + "/" + username + "/" + filename;
 
@@ -47,7 +47,7 @@ static bool FilesManager::check_file_exists(std::string username, std::string fi
     return true;
 }
 
-static bool FilesManager::check_storage_exists(std::string username)
+bool FilesManager::check_storage_exists(std::string username)
 {
     std::string candidate_path = storage_path + "/" + username;
 
@@ -58,7 +58,7 @@ static bool FilesManager::check_storage_exists(std::string username)
     return true;
 }
 
-static void FilesManager::add_user_directory(std::string username)
+void FilesManager::add_user_directory(std::string username)
 {
     std::string candidate_path = storage_path + "/" + username;
     mkdir(candidate_path.c_str(), 0700);

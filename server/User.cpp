@@ -62,7 +62,7 @@ bool User::check_password(std::string username, std::string password) const
     return false;
 }
 
-static unsigned int User::get_id(std::string db_pth, std::string username)
+unsigned int User::get_id(std::string db_pth, std::string username)
 {
     session sql(sqlite3, "dbname=" + db_pth);
 

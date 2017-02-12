@@ -114,7 +114,7 @@ bool CNSocket::send_message(std::string msg) const
 
     int status = write(sock_descriptor, raw_msg, strlen(raw_msg));
 
-    if ( status < 0)
+    if (status < 0)
     {
         LOG(ERROR) << "[Sys call failure] Failed on calling the system call write";
         std::exit(1);

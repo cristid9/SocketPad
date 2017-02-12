@@ -5,6 +5,7 @@
 #include "File.h"
 #include <glog/logging.h>
 
+// Replace with calls to the Helper
 const std::string db_name = "/home/cristi/computer_networks/colaborative_notepad/server/db/cn.sql";
 
 using json = nlohmann::json;
@@ -78,7 +79,7 @@ void CNServer::client_handler(CNSocket cnsock, User usr)
             LOG(INFO) << "[SERVER REQUESTED FILES FOR]"
                       << username;
 
-            std::vector<std::string> files = File::get_user_files(db_name,username);
+            std::vector<std::string> files = File::get_user_files(db_name, username);
             for (auto file : files)
             {
                 cnsock.send_message("FILE_OK");

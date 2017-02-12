@@ -4,7 +4,7 @@
 
 using namespace soci;
 
-static File& File::create(std::string db_path, User user, std::string filename)
+File& File::create(std::string db_path, User user, std::string filename)
 {
     session sql(sqlite3, "dbname=" + db_path);
 
@@ -16,18 +16,18 @@ static File& File::create(std::string db_path, User user, std::string filename)
 
 }
 
-static File& File::load(std::string db_path, User user, std::string filename)
+File& File::load(std::string db_path, User user, std::string filename)
 {
     // same as above
 }
 
-static File& File::load(std::string db_path, unsigned int file_id)
+File& File::load(std::string db_path, unsigned int file_id)
 {
     // same as above
 }
 
 
-static std::vector<std::string> get_user_files(std::string db_path, std::string username)
+std::vector<std::string> File::get_user_files(std::string db_path, std::string username)
 {
     session sql(sqlite3, "dbname=" + db_path);
 
