@@ -3,6 +3,7 @@
 
 #include <string>
 #include "external_dependencies/json.hpp"
+#include <sstream>
 
 using json = nlohmann::json;
 
@@ -14,7 +15,7 @@ using json = nlohmann::json;
 class Helper
 {
 private:
-    static const std::string config_path = "configs/config.json";
+    static const std::string config_path;
 public:
 
     /**

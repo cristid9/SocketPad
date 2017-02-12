@@ -1,9 +1,11 @@
 #include "Helper.h"
 #include <fstream>
 
-static json Helper::load_config()
+const std::string Helper::config_path = "/home/cristi/computer_networks/colaborative_notepad/server/configs/config.json";
+
+json Helper::load_config()
 {
-    std::ifstream in_file(config_path);
+    std::ifstream in_file(Helper::config_path);
     std::stringstream str_stream;
 
     str_stream << in_file.rdbuf();

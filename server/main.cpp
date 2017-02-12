@@ -8,7 +8,7 @@ using namespace google;
 int main(int argc, char** argv)
 {
 
-    auto json_config = Helper::load_config();
+    json json_config = Helper::load_config();
 
     FilesManager::load_values(json_config["storage_path"]);
 
