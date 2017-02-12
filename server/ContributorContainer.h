@@ -21,6 +21,11 @@ public:
     ContributorContainer(unsigned int cid, std::string cusername, CNSocket csock);
 
     /**
+     * @brief No arguments container.
+     */
+    ContributorContainer();
+
+    /**
      * @brief Getter for the `id` field.
      * @return The `id` of this contributor.
      */

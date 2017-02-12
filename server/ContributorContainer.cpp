@@ -5,10 +5,14 @@ ContributorContainer::ContributorContainer(unsigned int cid, std::string cuserna
 {
 }
 
+ContributorContainer::ContributorContainer()
+{
+}
+
 unsigned int ContributorContainer::get_id() const
 {
     return id;
-}
+}  
 
 std::string ContributorContainer::get_username() const
 {
