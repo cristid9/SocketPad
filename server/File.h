@@ -24,16 +24,18 @@ public:
      *
      * @param pth The path to the db file
      */
-    File(std::string pth);
+    File(std::string db_pth);
 
     /**
      * @brief Creates a new file (i.e. inserts a new record in the db)
      *
      * @param user The creator of this file
      * @param filename The name of this file
+     * @param path The path to this file in the internal storage.
+     *
      * @return The in-app model of the just created entry.
      */
-    static File& create(std::string db_path, User user, std::string filename);
+    static File& create(std::string db_path, User *user, std::string filename, std::string path);
 
     /**
      * @brief Loads the file created by the user `user` and with the name

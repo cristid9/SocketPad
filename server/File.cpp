@@ -4,16 +4,22 @@
 
 using namespace soci;
 
-File& File::create(std::string db_path, User user, std::string filename)
+File::File(std::string db_pth)
+{
+}
+
+File& File::create(std::string db_path, User *user, std::string filename, std::string path)
 {
     session sql(sqlite3, "dbname=" + db_path);
 
-    // insert an entry in to the database and, then, use the filesmanager to
-    // create an empty file on the disk. I think it should be in reverse oorder
+    sql << "INSERT INTO File (name, path, creator_id) VALUES (:name, :path, :creator_id)",
+            use(filename), use(path), use(user->get_id());
 
+    LOG(INFO) << "[DB ACCESS] Inserted new file in the database";
 
-    // throw some exception here
-
+    // replace later
+    File fl("dummy");
+    return fl;
 }
 
 File& File::load(std::string db_path, User user, std::string filename)

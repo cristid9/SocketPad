@@ -107,8 +107,11 @@ void CNServer::client_handler(CNSocket cnsock)
         }
         else if (client_request["action"].get<std::string>() == "CREATE_FILE")
         {
-            FilesManager::create_empty_file(session_user->get_username(),
+            std::string pth = FilesManager::create_empty_file(session_user->get_username(),
                 client_request["filename"].get<std::string>());
+
+            File::create(db_name, session_user,
+                client_request["filename"].get<std::string>(), pth);
 
             json answer = {{"action", "FILE_CREATED_OK"}};
             cnsock.send_message(answer.dump());

@@ -9,12 +9,13 @@
 
 using namespace soci;
 
-User::User(std::string db_p)
-    : db_path(db_p)
+User::User(std::string db_p, std::string usrnm)
+    : db_path(db_p), username(usrnm)
 {
+    id = User::get_id(db_path, username);
 }
 
-void User::create(std::string username, std::string password)
+void User::create(std::string db_path, std::string username, std::string password)
 {
     session sql(sqlite3, "dbname=" + db_path);
 
@@ -23,7 +24,7 @@ void User::create(std::string username, std::string password)
         use(username), use(password);
 }
 
-bool User::load(std::string username)
+bool User::load(std::string db_path, std::string username)
 {
     session sql(sqlite3, "dbname=" + db_path);
 
@@ -41,7 +42,7 @@ bool User::load(std::string username)
     return false;
 }
 
-bool User::check_password(std::string username, std::string password) const
+bool User::check_password(std::string db_path, std::string username, std::string password)
 {
     session sql(sqlite3, "dbname=" + db_path);
 
@@ -79,5 +80,12 @@ unsigned int User::get_id(std::string db_pth, std::string username)
     return id;
 }
 
+std::string User::get_username() const
+{
+    return username;
+}
 
-
+unsigned int User::get_id() const
+{
+    return id;
+}
