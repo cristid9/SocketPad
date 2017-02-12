@@ -33,7 +33,7 @@ std::vector<std::string> File::get_user_files(std::string db_path, std::string u
 
     unsigned int id = User:: get_id(db_path, username);
 
-    std::vector<std::string> files_list;
+    std::vector<std::string> files_list(100);
 
     sql << "SELECT name FROM File WHERE creator_id=:id",
         use(id), into(files_list);

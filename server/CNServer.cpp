@@ -37,44 +37,51 @@ void CNServer::client_handler(CNSocket cnsock, User usr)
     while (true)
     {
         msg = cnsock.get_message();
+
+        auto client_request = json::parse(msg);
+
         LOG(INFO) << "[DEBUG CLIENT_HANDLER]" << msg;
 
-        if (msg == "REGISTER")
+        if (client_request["action"].get<std::string>() == "REGISTER")
         {
-            std::string username = cnsock.get_message();
+            std::string username = client_request["username"].get<std::string>();
             LOG(INFO) << "[DEBUG CLIENT_HANDLER]" << username;
 
-            cnsock.get_message();
-            std::string password = cnsock.get_message();
+            std::string password = client_request["password"].get<std::string>();
 
             LOG(INFO) << "[DEBUG CLIENT_HANDLER]" << password;
 
             if (!usr.load(username)) {
-                cnsock.send_message("REGISTER_EXISTS");
-            } else {
-                cnsock.send_message("REGISTER_OK");
-                usr.create(username, password);
-            }
-        }
-        else if (msg == "LOGIN")
-        {
-            std::string username = cnsock.get_message();
-            cnsock.get_message();
-            std::string password = cnsock.get_message();
-
-            if (usr.check_password(username, password))
-            {
-                cnsock.send_message("LOGIN_OK");
+                json answer = {{"action", "REGISTER_EXISTS"}};
+                cnsock.send_message(answer.dump());
             }
             else
             {
-                cnsock.send_message("LOGIN_FAIL");
+                json answer = {{"action", "REGISTER_OK"}};
+                cnsock.send_message(answer.dump());
+                usr.create(username, password);
             }
         }
-        else if (msg == "LIST_FILES")
+        else if (client_request["action"].get<std::string>() == "LOGIN")
+        {
+            std::string username = client_request["username"].get<std::string>();
+            std::string password = client_request["password"].get<std::string>();
+
+            if (usr.check_password(username, password))
+            {
+                json answer = { {"action", "LOGIN_OK"} };
+                cnsock.send_message(answer.dump());
+            }
+            else
+            {
+                json answer = { {"action", "LOGIN_FAIL"} };
+                cnsock.send_message(answer.dump());
+            }
+        }
+        else if (client_request["action"].get<std::string>() == "LIST_FILES")
         {
 
-            std::string username = cnsock.get_message();
+            std::string username = client_request["username"].get<std::string>();
 
             LOG(INFO) << "[SERVER REQUESTED FILES FOR]"
                       << username;
@@ -82,14 +89,21 @@ void CNServer::client_handler(CNSocket cnsock, User usr)
             std::vector<std::string> files = File::get_user_files(db_name, username);
             for (auto file : files)
             {
-                cnsock.send_message("FILE_OK");
-                cnsock.send_message(file);
+                json answer = {
+                        {"action", "FILE_OK"},
+                        {"item", file.c_str()}
+                };
+
+                cnsock.send_message(answer.dump());
                 LOG(INFO) << "[SERVER SEND FILE]"
                           << "sending file"
                           << file;
 
             }
-            cnsock.send_message("FILES_DONE");
+
+            json answer = {{"action", "FILES_DONE"}};
+
+            cnsock.send_message(answer.dump());
         }
     }
 }

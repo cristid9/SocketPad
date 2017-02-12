@@ -2,6 +2,9 @@
 #include "clsock.h"
 #include <QDebug>
 #include "global_objs.h"
+#include "json.hpp"
+
+using json = nlohmann::json;
 
 FilesManager::FilesManager()
 {
@@ -9,8 +12,13 @@ FilesManager::FilesManager()
 
 std::vector<std::string> FilesManager::get_user_files(string username)
 {
-    clsock.write_msg("LIST_FILES");
-    clsock.write_msg(username);
+
+    json request = {
+        {"action", "LIST_FILES"},
+        {"username", username.c_str()}
+    };
+
+    clsock.write_msg(request.dump());
 
     std::vector<std::string> files;
 
@@ -19,17 +27,20 @@ std::vector<std::string> FilesManager::get_user_files(string username)
     while (true)
     {
         msg = clsock.read_msg();
-        if (msg == "FILE_OK")
+
+        auto server_answer = json::parse(msg);
+
+        if (server_answer["action"].get<std::string>() == "FILE_OK")
         {
             qDebug() << "[FILES MANAGER RETRIEVER]"
                      << "We got yet another ";
 
         }
-        else if (msg == "FILES_DONE")
+        else if (server_answer["action"].get<std::string>() == "FILES_DONE")
         {
             break;
         }
-        std::string file_name = clsock.read_msg();
+        std::string file_name = server_answer["item"].get<std::string>();
 
         qDebug() << "[FILES MANAGER RETRIEVER]"
                  << "We got file with name ";
