@@ -7,6 +7,10 @@
 #include <glog/logging.h>
 
 
+CNSocket::CNSocket()
+{
+}
+
 CNSocket::CNSocket(const int port, const long addr)
 {
     sock_server = true;

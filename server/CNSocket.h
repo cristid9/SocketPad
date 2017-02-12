@@ -39,6 +39,11 @@ public:
     CNSocket(int sock_d, struct sockaddr_in sa);
 
     /**
+     * @brief No-arguments constructor for `CNSocket`.
+     */
+    CNSocket();
+
+    /**
      * Wrapper for `listen` sys call.
      */
     void cnlisten() const;
