@@ -40,7 +40,7 @@ std::vector<std::string> FilesManager::get_user_files(string username)
         {
             break;
         }
-        std::string file_name = server_answer["item"].get<std::string>();
+        std::string file_name = server_answer["filename"].get<std::string>();
 
         qDebug() << "[FILES MANAGER RETRIEVER]"
                  << "We got file with name ";
