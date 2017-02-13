@@ -12,7 +12,7 @@ ContributorContainer::ContributorContainer()
 unsigned int ContributorContainer::get_id() const
 {
     return id;
-}  
+}
 
 std::string ContributorContainer::get_username() const
 {
@@ -22,4 +22,13 @@ std::string ContributorContainer::get_username() const
 CNSocket ContributorContainer::get_sock() const
 {
     return sock;
+}
+
+ContributorContainer& ContributorContainer::operator=(const ContributorContainer &cc)
+{
+    id = cc.get_id();
+    username = cc.get_username();
+    sock = cc.get_sock();
+
+    return *this;
 }

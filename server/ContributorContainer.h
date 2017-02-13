@@ -42,6 +42,11 @@ public:
      * @return The socket connected to this user's client.
      */
     CNSocket get_sock() const;
+
+    /**
+     * @brief Overload for the asignment operator in order to simplify stl conatiners usage.
+     */
+    ContributorContainer &operator=(const ContributorContainer &cc);
 };
 
 
