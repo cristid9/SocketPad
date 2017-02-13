@@ -29,7 +29,7 @@ void CNServer::start_server()
     }
  }
 
-void CNServer::client_handler(CNSocket cnsock, std::map<unsigned int, FileEditRoom> room)
+void CNServer::client_handler(CNSocket cnsock, std::map<unsigned int, FileEditRoom> rooms)
 {
     LOG(INFO) << "Waiting for a message from a client";
 
@@ -132,9 +132,34 @@ void CNServer::client_handler(CNSocket cnsock, std::map<unsigned int, FileEditRo
         }
         else if (client_request["action"].get<std::string>() == "INIT_PEER_EDIT_FILE")
         {
-            std::string filename = client_request["action"].get<std::string>();
+            std::string filename = client_request["filename"].get<std::string>();
             std::string author = client_request["author"].get<std::string>();
+            std::string initer = client_request["username"].get<std::string>();
             unsigned int file_id = File::get_id(db_name, filename, author);
+
+            if (rooms.find(file_id) != rooms.end())
+            {
+                // return the id of the existing room
+                json answer;
+                answer["room_id"] = file_id;
+                answer["action"] = "ROOM_EXISTS";
+
+                cnsock.send_message(answer.dump());
+            }
+            else
+            {
+                // create the room
+                ContributorContainer ctb(User::get_id(db_name, initer), initer, cnsock);
+
+                rooms[file_id] = FileEditRoom(filename, file_id);
+                rooms[file_id].add_contributor(ctb);
+
+                json answer;
+                answer["action"] = "ROOM_CREATED_SUCCESS";
+                answer["room_id"] = file_id;
+
+                cnsock.send_message(answer.dump());
+            }
         }
     }
 }

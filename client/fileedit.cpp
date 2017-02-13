@@ -3,6 +3,7 @@
 #include "global_objs.h"
 #include "json.hpp"
 #include <QString>
+#include <sstream>
 
 using json = nlohmann::json;
 
@@ -32,6 +33,26 @@ void FileEdit::init_room()
     };
 
     clsock.write_msg(request.dump());
+
+    json answer = json::parse(clsock.read_msg());
+
+    Mbox = new QMessageBox();
+    if (answer["action"].get<std::string>() == "ROOM_CREATED_SUCCESS")
+    {
+        Mbox->setText("Room created succesfully");
+        Mbox->show();
+    }
+    else if (answer["action"].get<std::string>() == "ROOM_EXISTS")
+    {
+
+        Mbox->setText("Someone else started editing this file in peer mode");
+        Mbox->show();
+    }
+
+    stringstream tmpstr;
+    tmpstr << answer["room_id"].get<int>();
+
+    this->ui->label_3->setText(tmpstr.str().c_str());
 
 }
 

@@ -2,6 +2,7 @@
 #define FILEEDIT_H
 
 #include <QWidget>
+#include <QMessageBox>
 
 namespace Ui {
 class FileEdit;
@@ -15,15 +16,16 @@ public:
     explicit FileEdit(QWidget *parent = 0);
     ~FileEdit();
     void set_filename(std::string fn);
+    /**
+     * @brief Tells the server to create a new room for editing this file.
+     */
+    void init_room();
 
 private:
     Ui::FileEdit *ui;
     QWidget *parent;
-    /**
-     * @brief Tell sthe server to create a new room for editing this file.
-     */
-    void init_room();
     std::string filename;
+    QMessageBox *Mbox;
 };
 
 #endif // FILEEDIT_H
