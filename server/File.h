@@ -11,13 +11,16 @@
 class File
 {
 private:
-    /* specify file attributes here */
     std::string file_path;
     std::string file_name;
     unsigned int file_id;
+    std::string author;
+    std::string db_path;
 
-    /* find a way to keep track of links to the contributors... */
-    /* how the hell am I going to do that */
+    /**
+     * @brief Gets the username of the user who created this file.
+     */
+    std::string get_author_username() const;
 
 public:
     /**
@@ -39,7 +42,7 @@ public:
      * @param file_name Name of the file.
      * @param id Id of the file in db.
      */
-    File(std::string file_path, std::string file_name, unsigned int id);
+    File(std::string db_path, std::string file_path, std::string file_name, unsigned int id);
 
     /**
      * @brief Creates a new file (i.e. inserts a new record in the db)
@@ -81,6 +84,11 @@ public:
     static std::vector<File> get_user_files(std::string db_path, std::string username);
 
     /**
+     * @brief Getter for the `author` field.
+     */
+    std::string get_author() const;
+
+    /**
      * @brief Getter for the `file_path` field.
      * @return Path to this file.
      */
@@ -97,6 +105,11 @@ public:
      * @return Id of this file.
      */
     unsigned int get_id() const;
+
+    /**
+     * @brief Static method for retrieval of a file `id`.
+     */
+    static unsigned int get_id(std::string db_path, std::string filename, std::string author);
 };
 
 

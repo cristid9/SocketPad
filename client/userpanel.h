@@ -2,6 +2,7 @@
 #define USERPANEL_H
 
 #include <QWidget>
+#include <QMessageBox>
 #include "fileedit.h"
 
 namespace Ui {
@@ -27,6 +28,7 @@ private:
     QWidget *parent;
     FileEdit *editFile;
     void load_files();
+    QMessageBox *Mbox;
 };
 
 #endif // USERPANEL_H

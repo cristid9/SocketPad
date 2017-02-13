@@ -26,14 +26,7 @@ private:
      */
     static bool check_storage_exists(std::string username);
 
-    /**
-     * @brief Check if a file is in the user's directory.
-     *
-     * @param username The targeted user.
-     * @param filename The targeted file.
-     * @return `true` if it exists or `false` if it doesn't.
-     */
-    static bool check_file_exists(std::string username, std::string filename);
+
 public:
 
     FilesManager();
@@ -49,6 +42,14 @@ public:
      */
     static std::string create_empty_file(std::string username, std::string filename);
 
+    /**
+     * @brief Check if a file is in the user's directory.
+     *
+     * @param username The targeted user.
+     * @param filename The targeted file.
+     * @return `true` if it exists or `false` if it doesn't.
+     */
+    static bool check_file_exists(std::string username, std::string filename);
 
     /**
      * @brief Creates a directory in the storage location for he specified user.

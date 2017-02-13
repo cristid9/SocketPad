@@ -83,6 +83,11 @@ public:
      * @return Returns the `id` of the current instance.
      */
     unsigned int get_id() const;
+
+    /**
+     * @brief Gets the username of the user with this id.
+     */
+    static std::string get_username(std::string db_path, unsigned int id);
 };
 
 #endif //SERVER_USER_H

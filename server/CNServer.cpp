@@ -96,6 +96,7 @@ void CNServer::client_handler(CNSocket cnsock, std::map<unsigned int, FileEditRo
                 json answer = {
                         {"action", "FILE_OK"},
                         {"filename",  file.get_name().c_str()},
+                        {"author", file.get_author().c_str()}
                 };
 
                 answer["fileid"] = file.get_id();
@@ -111,20 +112,29 @@ void CNServer::client_handler(CNSocket cnsock, std::map<unsigned int, FileEditRo
 
             cnsock.send_message(answer.dump());
         }
-        else if (client_request["action"].get<std::string>() == "CREATE_FILE")
-        {
-            std::string pth = FilesManager::create_empty_file(session_user->get_username(),
-                client_request["filename"].get<std::string>());
+        else if (client_request["action"].get<std::string>() == "CREATE_FILE") {
+            if (FilesManager::check_file_exists(session_user->get_username(),
+                                                client_request["filename"].get<std::string>()))
+            {
+                json answer = {{"action", "FILE_ALREADY_EXISTS"}};
+                cnsock.send_message(answer.dump());
+            } else {
+                std::string pth = FilesManager::create_empty_file(session_user->get_username(),
+                                                                  client_request["filename"].get<std::string>());
 
-            File::create(db_name, session_user,
-                client_request["filename"].get<std::string>(), pth);
+                File::create(db_name, session_user,
+                             client_request["filename"].get<std::string>(), pth);
 
-            json answer = {{"action", "FILE_CREATED_OK"}};
-            cnsock.send_message(answer.dump());
+                json answer = {{"action", "FILE_CREATED_OK"}};
+                cnsock.send_message(answer.dump());
+
+            }
         }
-        else if (client_request["action"].get<std::string>() == "INIT_EDIT_FILE")
+        else if (client_request["action"].get<std::string>() == "INIT_PEER_EDIT_FILE")
         {
-
+            std::string filename = client_request["action"].get<std::string>();
+            std::string author = client_request["author"].get<std::string>();
+            unsigned int file_id = File::get_id(db_name, filename, author);
         }
     }
 }

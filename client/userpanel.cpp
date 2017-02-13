@@ -48,8 +48,6 @@ void UserPanel::reload_files()
     load_files();
 }
 
-// fuck, man plictisit
-
 
 UserPanel::~UserPanel()
 {
@@ -69,8 +67,6 @@ void UserPanel::on_pushButton_2_clicked()
 
 void UserPanel::on_pushButton_3_clicked()
 {
-    // display a pop-up, get new files name, tell the server to create it, yada yada...
-
     qInfo() << QString("[CREATE FILE] create new file");
 
     bool ok;
@@ -80,9 +76,14 @@ void UserPanel::on_pushButton_3_clicked()
 
 
 
-    // now tell the server about your accomplishemnt
+    bool status = fm.create_new_file(filename.toUtf8().constData());
 
-    fm.create_new_file(filename.toUtf8().constData());
+    if (!status)
+    {
+        Mbox = new QMessageBox();
+        Mbox->setText("File already exists");
+        Mbox->show();
+    }
 
     reload_files();
 }

@@ -89,3 +89,18 @@ unsigned int User::get_id() const
 {
     return id;
 }
+
+std::string User::get_username(std::string db_pth, unsigned int id)
+{
+    session sql(sqlite3, "dbname=" + db_pth);
+
+    std::string username;
+
+    sql << "SELECT username FROM User WHERE id=:id",
+        use(id), into(username);
+
+    LOG(INFO) << "[DB ACCESS] Retrieved username for the id "
+              << id;
+
+    return username;
+}

@@ -12,9 +12,22 @@ File::File(std::string db_pth)
 {
 }
 
-File::File(std::string vfile_path, std::string vfile_name, unsigned int vid)
-    : file_path(vfile_path), file_name(vfile_name), file_id(vid)
+File::File(std::string db_pth, std::string vfile_path, std::string vfile_name, unsigned int vid)
+    : db_path(db_pth), file_path(vfile_path), file_name(vfile_name), file_id(vid)
 {
+    author = get_author_username();
+}
+
+std::string File::get_author_username() const
+{
+    session sql(sqlite3, "dbname=" + db_path);
+
+    unsigned int creator_id;
+
+    sql << "SELECT creator_id FROM File WHERE id=:file_id",
+        use(file_id), into(creator_id);
+
+    return User::get_username(db_path, creator_id);
 }
 
 File File::create(std::string db_path, User *user, std::string filename, std::string path)
@@ -62,7 +75,7 @@ std::vector<File> File::get_user_files(std::string db_path, std::string username
         name = (*it).get<std::string>(1);
         id = (*it).get<int>(2);
 
-        File f(pth, name, id);
+        File f(db_path, pth, name, id);
 
         files.push_back(f);
     }
@@ -87,4 +100,26 @@ std::string File::get_name() const
 std::string File::get_path() const
 {
     return file_path;
+}
+
+unsigned int File::get_id(std::string db_path, std::string filename, std::string author)
+{
+    session sql(sqlite3, "dbname=" + db_path);
+
+    unsigned int user_id = User::get_id(db_path, author);
+
+    unsigned int id;
+
+    sql << "SELECT id FROM File WHERE name=:name AND creator_id=:user_id",
+        use(filename), use(user_id), into(id);
+
+    LOG(INFO) << "[DB ACCESS] Retrived id for file "
+              << filename;
+
+    return id;
+}
+
+std::string File::get_author() const
+{
+    return author;
 }

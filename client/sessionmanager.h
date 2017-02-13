@@ -9,6 +9,7 @@ class SessionManager
 {
 private:
     std::string username;
+    unsigned int user_id;
 
 public:
 
@@ -29,6 +30,7 @@ public:
      * @return returns he username logged in in the current session
      */
     std::string get_username() const;
-};
+
+ };
 
 #endif // SESSIONMANAGER_H

@@ -41,11 +41,14 @@ std::vector<std::string> FilesManager::get_user_files(string username)
             break;
         }
         std::string file_name = server_answer["filename"].get<std::string>();
+        std::string author = server_answer["author"].get<std::string>();
+
+        std::string new_file = author + "/" + file_name;
 
         qDebug() << "[FILES MANAGER RETRIEVER]"
                  << "We got file with name ";
 
-        files.push_back(file_name);
+        files.push_back(new_file);
     }
 
     return files;
