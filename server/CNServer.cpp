@@ -161,5 +161,18 @@ void CNServer::client_handler(CNSocket cnsock, std::map<unsigned int, FileEditRo
                 cnsock.send_message(answer.dump());
             }
         }
+        else if (client_request["action"].get<std::string>() == "GET_FILE_TEXT")
+        {
+            std::string author = client_request["author"].get<std::string>();
+            std::string filename = client_request["filename"].get<std::string>();
+
+            std::string file_text = FilesManager::load_file_text(author, filename);
+
+            json answer;
+            answer["action"] = "FILE_TEXT_RETRIEVED_OK";
+            answer["text"] = file_text;
+
+            cnsock.send_message(answer.dump());
+        }
     }
 }

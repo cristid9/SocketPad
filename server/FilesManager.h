@@ -66,6 +66,12 @@ public:
      * @param storage_pth The pathe to the storage dir.
      */
     static void load_values(std::string storage_pth);
+
+    /**
+     * @brief Load the text of the file with id `id`.
+     * @return The text of the targeted file.
+     */
+    static std::string load_file_text(std::string username, std::string filename);
 };
 
 

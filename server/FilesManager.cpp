@@ -1,13 +1,11 @@
-//
-// Created by cristi on 26.01.17.
-//
-
 #include "FilesManager.h"
 #include <soci/soci.h>
 #include <soci/sqlite3/soci-sqlite3.h>
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <fstream>
+#include <glog/logging.h>
 
 using namespace soci;
 
@@ -16,6 +14,22 @@ std::string FilesManager::storage_path = "";
 void FilesManager::load_values(std::string storage_pth)
 {
     FilesManager::storage_path = storage_pth;
+}
+
+std::string FilesManager::load_file_text(std::string username, std::string filename)
+{
+    std::string path = storage_path + "/" + username + "/" + filename;
+
+    std::ifstream in_file(path);
+    std::stringstream str_stream;
+
+    str_stream << in_file.rdbuf();
+    std::string text = str_stream.str();
+
+    LOG(INFO) << "[STORAGE ACCESS] Loaded text for the file "
+              << path;
+
+    return text;
 }
 
 std::string FilesManager::create_empty_file(std::string username, std::string filename)

@@ -3,6 +3,7 @@
 #include "global_objs.h"
 #include "json.hpp"
 #include <QString>
+#include <QDebug>
 #include <sstream>
 
 using json = nlohmann::json;
@@ -52,8 +53,28 @@ void FileEdit::init_room()
     stringstream tmpstr;
     tmpstr << answer["room_id"].get<int>();
 
+    file_id = answer["room_id"].get<int>();
+
     this->ui->label_3->setText(tmpstr.str().c_str());
 
+}
+
+void FileEdit::load_room_file_data()
+{
+    QStringList strlist = QString::fromStdString(filename).split("/");
+
+    std::string file_text = fm.load_file(strlist.value(0).toUtf8().constData(),
+                                         strlist.value(1).toUtf8().constData());
+
+    this->ui->textEdit->setText(QString::fromStdString(file_text));
+    qInfo() << QString("[TEXT LOADED] Loaded text with the value")
+            << QString(file_text.c_str());
+}
+
+void FileEdit::handle_room_logic()
+{
+    init_room();
+    load_room_file_data();
 }
 
 void FileEdit::set_filename(std::string fn)

@@ -61,7 +61,7 @@ void UserPanel::on_pushButton_2_clicked()
                 this->ui->listView->model()->index(
                     this->ui->listView->selectionModel()->currentIndex().row(), 0)
                 .data(Qt::DisplayRole).toString().toUtf8().constData());
-    editFile->init_room();
+    editFile->handle_room_logic();
     editFile->show();
     this->ui->listView->hide();
     this->ui->label->hide();

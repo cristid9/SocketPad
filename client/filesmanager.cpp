@@ -54,6 +54,25 @@ std::vector<std::string> FilesManager::get_user_files(string username)
     return files;
 }
 
+std::string FilesManager::load_file(std::string username, std::string filename)
+{
+    json request;
+    request["action"] = "GET_FILE_TEXT";
+    request["filename"] = filename;
+    request["author"] = username;
+
+    clsock.write_msg(request.dump());
+
+    json answer = json::parse(clsock.read_msg());
+
+    if (answer["action"].get<std::string>() == "FILE_TEXT_RETRIEVED_OK")
+    {
+        return answer["text"].get<std::string>();
+    }
+
+    return "";
+}
+
 bool FilesManager::create_new_file(std::string filename)
 {
     json request = {

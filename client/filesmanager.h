@@ -29,6 +29,12 @@ public:
      * @return `true` if the file was create successfully, `false` otherwise.
      */
     bool create_new_file(std::string filename);
+
+    /**
+     * @brief Retrieves the text of the currently edited file from the server.
+     * @return The text of the targeted file;
+     */
+    std::string load_file(std::string username, std::string filename);
 };
 
 #endif // FILESMANAGER_H
