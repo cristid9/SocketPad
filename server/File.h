@@ -14,6 +14,7 @@ private:
     /* specify file attributes here */
     std::string file_path;
     std::string file_name;
+    unsigned int file_id;
 
     /* find a way to keep track of links to the contributors... */
     /* how the hell am I going to do that */
@@ -27,6 +28,20 @@ public:
     File(std::string db_pth);
 
     /**
+     * @brief No arguments constructor.
+     */
+    File();
+
+    /**
+     * @brief Use this container when you want this class to act as a container for those 3 fields.
+     *
+     * @param file_path Path to the file.
+     * @param file_name Name of the file.
+     * @param id Id of the file in db.
+     */
+    File(std::string file_path, std::string file_name, unsigned int id);
+
+    /**
      * @brief Creates a new file (i.e. inserts a new record in the db)
      *
      * @param user The creator of this file
@@ -35,7 +50,7 @@ public:
      *
      * @return The in-app model of the just created entry.
      */
-    static File& create(std::string db_path, User *user, std::string filename, std::string path);
+    static File create(std::string db_path, User *user, std::string filename, std::string path);
 
     /**
      * @brief Loads the file created by the user `user` and with the name
@@ -63,7 +78,25 @@ public:
      * @param username The targeted user.
      * @return A container with the file names created or edited by this user.
      */
-    static std::vector<std::string> get_user_files(std::string db_path, std::string username);
+    static std::vector<File> get_user_files(std::string db_path, std::string username);
+
+    /**
+     * @brief Getter for the `file_path` field.
+     * @return Path to this file.
+     */
+    std::string get_path() const;
+
+    /**
+     * @brief Getter for `name` field.
+     * @return Name of this file.
+     */
+    std::string get_name() const;
+
+    /**
+     * @brief Getter `id` field.
+     * @return Id of this file.
+     */
+    unsigned int get_id() const;
 };
 
 

@@ -10,13 +10,15 @@
 #include "CNSocket.h"
 #include "User.h"
 #include "FilesManager.h"
+#include "FileEditRoom.h"
+#include <map>
 
 class CNServer {
 private:
     static const int server_port = 3131;
     static const long server_addr = INADDR_ANY;
 
-    void client_handler(CNSocket cnsock);
+    void client_handler(CNSocket cnsock, std::map<unsigned int, FileEditRoom>);
 
 public:
 

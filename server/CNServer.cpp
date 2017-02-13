@@ -3,7 +3,9 @@
 #include "FilesManager.h"
 #include "external_dependencies/json.hpp"
 #include "File.h"
+#include "FileEditRoom.h"
 #include <glog/logging.h>
+#include <map>
 
 // Replace with calls to the Helper
 const std::string db_name = "/home/cristi/computer_networks/colaborative_notepad/server/db/cn.sql";
@@ -13,6 +15,8 @@ using json = nlohmann::json;
 void CNServer::start_server()
 {
 
+    // pairs of the form <file_id: room-related data>
+    std::map<unsigned int, FileEditRoom> rooms;
     CNSocket sock(server_port, server_addr);
     sock.cnlisten();
 
@@ -20,12 +24,12 @@ void CNServer::start_server()
     {
         CNSocket cnclient = sock.cnaccept();
 
-        std::thread client_thread(&CNServer::client_handler, this, cnclient);
+        std::thread client_thread(&CNServer::client_handler, this, cnclient, rooms);
         client_thread.detach();
     }
  }
 
-void CNServer::client_handler(CNSocket cnsock)
+void CNServer::client_handler(CNSocket cnsock, std::map<unsigned int, FileEditRoom> room)
 {
     LOG(INFO) << "Waiting for a message from a client";
 
@@ -86,18 +90,20 @@ void CNServer::client_handler(CNSocket cnsock)
             LOG(INFO) << "[SERVER REQUESTED FILES FOR]"
                       << username;
 
-            std::vector<std::string> files = File::get_user_files(db_name, username);
+            std::vector<File> files = File::get_user_files(db_name, username);
             for (auto file : files)
             {
                 json answer = {
                         {"action", "FILE_OK"},
-                        {"item", file.c_str()}
+                        {"filename",  file.get_name().c_str()},
                 };
+
+                answer["fileid"] = file.get_id();
 
                 cnsock.send_message(answer.dump());
                 LOG(INFO) << "[SERVER SEND FILE]"
                           << "sending file"
-                          << file;
+                          << file.get_name();
 
             }
 
@@ -115,6 +121,10 @@ void CNServer::client_handler(CNSocket cnsock)
 
             json answer = {{"action", "FILE_CREATED_OK"}};
             cnsock.send_message(answer.dump());
+        }
+        else if (client_request["action"].get<std::string>() == "INIT_EDIT_FILE")
+        {
+
         }
     }
 }

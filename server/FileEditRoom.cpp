@@ -17,18 +17,19 @@ void FileEditRoom::add_contributor(ContributorContainer ctb)
 
 void FileEditRoom::remove_contributor(unsigned int id)
 {
-    contributors.erase(
-            std::remove_if(
-                    contributors.begin(),
-                    contributors.end(),
-                    [=](ContributorContainer ctb) { return ctb.get_id() == id; }
-            )
-    );
+    for (auto it = contributors.begin(), end = contributors.end(); it != end; ++it)
+    {
+        if ((*it).get_id() == id)
+        {
+            contributors.erase(it);
+            break;
+        }
+    }
 }
 
 void FileEditRoom::propaget_change(unsigned int author_id, std::string change)
 {
-    // Ideally each message should be sent in a differnt thread
+    // Ideally each message should be sent in a different thread
     for (auto ctb : contributors)
     {
         if (ctb.get_id() != author_id)

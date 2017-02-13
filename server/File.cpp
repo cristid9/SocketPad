@@ -4,11 +4,20 @@
 
 using namespace soci;
 
+File::File()
+{
+}
+
 File::File(std::string db_pth)
 {
 }
 
-File& File::create(std::string db_path, User *user, std::string filename, std::string path)
+File::File(std::string vfile_path, std::string vfile_name, unsigned int vid)
+    : file_path(vfile_path), file_name(vfile_name), file_id(vid)
+{
+}
+
+File File::create(std::string db_path, User *user, std::string filename, std::string path)
 {
     session sql(sqlite3, "dbname=" + db_path);
 
@@ -33,20 +42,49 @@ File& File::load(std::string db_path, unsigned int file_id)
 }
 
 
-std::vector<std::string> File::get_user_files(std::string db_path, std::string username)
+std::vector<File> File::get_user_files(std::string db_path, std::string username)
 {
     session sql(sqlite3, "dbname=" + db_path);
 
     unsigned int id = User:: get_id(db_path, username);
 
-    std::vector<std::string> files_list(100);
+    std::vector<File> files;
 
-    sql << "SELECT name FROM File WHERE creator_id=:id",
-        use(id), into(files_list);
+    soci::rowset<soci::row> files_list = (
+            sql.prepare << "SELECT path, name, id FROM File WHERE creator_id=" << id);
+
+    for (soci::rowset<soci::row>::iterator it = files_list.begin(); it != files_list.end(); ++it)
+    {
+        std::string pth, name;
+        unsigned int id;
+
+        pth = (*it).get<std::string>(0);
+        name = (*it).get<std::string>(1);
+        id = (*it).get<int>(2);
+
+        File f(pth, name, id);
+
+        files.push_back(f);
+    }
 
     LOG(INFO)  << "[DB ACCESS]"
                << " Retrieved list of created files for the user "
                << username;
 
-    return files_list;
+    return files;
+}
+
+unsigned int File::get_id() const
+{
+    return file_id;
+}
+
+std::string File::get_name() const
+{
+    return file_name;
+}
+
+std::string File::get_path() const
+{
+    return file_path;
 }
