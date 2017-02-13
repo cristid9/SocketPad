@@ -2,6 +2,7 @@
 #include "ui_fileedit.h"
 #include "global_objs.h"
 #include "json.hpp"
+#include "filechange.h"
 #include <QString>
 #include <QDebug>
 #include <sstream>
@@ -69,6 +70,8 @@ void FileEdit::load_room_file_data()
     this->ui->textEdit->setText(QString::fromStdString(file_text));
     qInfo() << QString("[TEXT LOADED] Loaded text with the value")
             << QString(file_text.c_str());
+
+    current_file_text = file_text;
 }
 
 void FileEdit::handle_room_logic()
@@ -85,4 +88,41 @@ void FileEdit::set_filename(std::string fn)
 FileEdit::~FileEdit()
 {
     delete ui;
+}
+
+void FileEdit::on_textEdit_textChanged()
+{
+    qInfo() << "[FILE EDIT] user has changed a character";
+
+    std::string new_text = this->ui->textEdit->toPlainText().toUtf8().constData();
+
+    FileChange fl_change = FileChange::detect_change(current_file_text, new_text);
+
+    qInfo() << "[FILE EDIT] charachter "
+            << QString(fl_change.get_target());
+
+    current_file_text = new_text;
+
+    qInfo() << "[FILE EDIT] Peer notify event broadcasted";
+
+    std::string request_type;
+    switch (fl_change.get_type())
+    {
+    case ChangeType::FILE_CHANGE_INSERT:
+        request_type = "insert";
+        break;
+    case ChangeType::FILE_CHANGE_DELETE:
+        request_type = "delete";
+    case ChangeType::FILE_CHANGE_REPLACE:
+        request_type = "replace";
+    }
+
+    json request;
+    request["action"] = "PEER_NOTIFY_FILE_CHANGE";
+    request["file_id"] = file_id;
+    request["type"] = request_type;
+    request["position"] = fl_change.get_pos();
+    request["target"] = fl_change.get_target();
+
+    clsock.write_msg(request.dump());
 }

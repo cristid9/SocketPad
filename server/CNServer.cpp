@@ -174,5 +174,19 @@ void CNServer::client_handler(CNSocket cnsock, std::map<unsigned int, FileEditRo
 
             cnsock.send_message(answer.dump());
         }
+        else if (client_request["action"].get<std::string>() == "PEER_NOTIFY_FILE_CHANGE")
+        {
+            unsigned int file_id = client_request["file_id"].get<int>();
+
+            LOG(INFO) << "[ROOM ACCESS] Peer broadcasted change, author "
+                      << session_user->get_username()
+                      << " targeted file "
+                      << file_id;
+
+            json answer;
+
+            rooms[file_id].propagate_change(session_user->get_id(), answer.dump());
+
+        }
     }
 }

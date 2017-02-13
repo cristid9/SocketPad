@@ -33,7 +33,8 @@ SOURCES += main.cpp\
     loginform.cpp \
     filesmanager.cpp \
     userpanel.cpp \
-    fileedit.cpp
+    fileedit.cpp \
+    filechange.cpp
 
 HEADERS  += mainwindow.h \
     clsock.h \
@@ -44,7 +45,8 @@ HEADERS  += mainwindow.h \
     loginform.h \
     filesmanager.h \
     userpanel.h \
-    fileedit.h
+    fileedit.h \
+    filechange.h
 
 FORMS    += mainwindow.ui \
     regiisterform.ui \
