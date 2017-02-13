@@ -56,7 +56,7 @@ public:
      * @param author_id Author of the change.
      * @param change Serialized json contining the
      */
-    void propaget_change(unsigned int author_id, std::string change);
+    void propagate_change(unsigned int author_id, std::string change);
 };
 
 

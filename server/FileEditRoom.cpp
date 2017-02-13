@@ -27,7 +27,7 @@ void FileEditRoom::remove_contributor(unsigned int id)
     }
 }
 
-void FileEditRoom::propaget_change(unsigned int author_id, std::string change)
+void FileEditRoom::propagate_change(unsigned int author_id, std::string change)
 {
     // Ideally each message should be sent in a different thread
     for (auto ctb : contributors)
