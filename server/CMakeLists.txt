@@ -5,7 +5,7 @@ project(server)
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
 set(CMAKE_CXX_STANDARD 11)
-set(SOURCE_FILES main.cpp CNServer.cpp CNServer.h CNSocket.cpp CNSocket.h User.cpp User.h File.cpp File.h FilesManager.cpp FilesManager.h Helper.cpp Helper.h RoomManager.cpp RoomManager.h FileEditRoom.cpp FileEditRoom.h)
+set(SOURCE_FILES main.cpp CNServer.cpp CNServer.h CNSocket.cpp CNSocket.h User.cpp User.h File.cpp File.h FilesManager.cpp FilesManager.h Helper.cpp Helper.h RoomManager.cpp RoomManager.h FileEditRoom.cpp FileEditRoom.h ContributorContainer.cpp ContributorContainer.h)
 set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
 set(THREADS_PREFER_PTHREAD_FLAG TRUE)
 
