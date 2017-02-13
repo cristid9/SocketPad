@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QMessageBox>
+#include "filechange.h"
 
 namespace Ui {
 class FileEdit;
@@ -44,7 +45,15 @@ private:
      */
     void load_room_file_data();
 
+    /**
+     * @brief Updates the qedit according to the changes made by the peer.
+     */
+    void apply_change(FileChange change, std::string author);
 
+    /**
+     * @brief Spawned in a new thred, handles responses from the server.
+     */
+    void client_handler();
 };
 
 #endif // FILEEDIT_H

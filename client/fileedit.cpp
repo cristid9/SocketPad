@@ -6,6 +6,7 @@
 #include <QString>
 #include <QDebug>
 #include <sstream>
+#include <thread>
 
 using json = nlohmann::json;
 
@@ -78,6 +79,55 @@ void FileEdit::handle_room_logic()
 {
     init_room();
     load_room_file_data();
+    std::thread background_handler(&FileEdit::client_handler, this);
+
+    background_handler.detach();
+}
+
+void FileEdit::client_handler()
+{
+    std::string response;
+
+    while (true)
+    {
+        response = clsock.read_msg();
+        json server_response = json::parse(response);
+
+        if (server_response["action"].get<std::string>() == "PEER_EDIT_PROPAGATION")
+        {
+            qInfo() << "[PEER EDIT ACTION] a peer broadcasted a change";
+
+            char target = server_response["target"].get<char>();
+            ChangeType type = server_response["type"].get<ChangeType>();
+            unsigned int pos = server_response["position"].get<int>();
+
+            FileChange fl_change(pos, target, type);
+
+            apply_change(fl_change, server_response["author"].get<std::string>());
+        }
+    }
+}
+
+void FileEdit::apply_change(FileChange change, std::string author)
+{
+    std::string tmp_txt = current_file_text;
+
+    switch (change.get_type())
+    {
+    case ChangeType::FILE_CHANGE_INSERT:
+        tmp_txt.insert(change.get_pos(), 1, change.get_target());
+        this->ui->label_3->setText("User" + QString::fromStdString(author) + "performed insertion");
+        break;
+    case ChangeType::FILE_CHANGE_DELETE:
+        tmp_txt.erase(tmp_txt.begin() + change.get_pos());
+        break;
+    case ChangeType::FILE_CHANGE_REPLACE:
+        tmp_txt[change.get_pos()] = change.get_target();
+        break;
+    }
+
+    this->ui->textEdit->setText(QString::fromStdString(tmp_txt));
+    current_file_text = tmp_txt;
 }
 
 void FileEdit::set_filename(std::string fn)
@@ -105,24 +155,13 @@ void FileEdit::on_textEdit_textChanged()
 
     qInfo() << "[FILE EDIT] Peer notify event broadcasted";
 
-    std::string request_type;
-    switch (fl_change.get_type())
-    {
-    case ChangeType::FILE_CHANGE_INSERT:
-        request_type = "insert";
-        break;
-    case ChangeType::FILE_CHANGE_DELETE:
-        request_type = "delete";
-    case ChangeType::FILE_CHANGE_REPLACE:
-        request_type = "replace";
-    }
-
     json request;
     request["action"] = "PEER_NOTIFY_FILE_CHANGE";
     request["file_id"] = file_id;
-    request["type"] = request_type;
+    request["type"] = fl_change.get_type();
     request["position"] = fl_change.get_pos();
     request["target"] = fl_change.get_target();
+    request["author"] = sm.get_username();
 
     clsock.write_msg(request.dump());
 }

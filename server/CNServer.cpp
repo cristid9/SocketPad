@@ -183,10 +183,9 @@ void CNServer::client_handler(CNSocket cnsock, std::map<unsigned int, FileEditRo
                       << " targeted file "
                       << file_id;
 
-            json answer;
-
+            json answer = client_request;
+            answer["action"] = "PEER_EDIT_PROPAGATION";
             rooms[file_id].propagate_change(session_user->get_id(), answer.dump());
-
         }
     }
 }
