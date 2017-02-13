@@ -12,7 +12,8 @@
 #include <netinet/in.h>
 #include <iostream>
 
-class CNSocket {
+class CNSocket
+{
 private:
     struct sockaddr_in sock;
     bool sock_server;
@@ -47,6 +48,11 @@ public:
      * Wrapper for `listen` sys call.
      */
     void cnlisten() const;
+
+    /**
+     * @brief Intended to be used with stl containers.
+     */
+    CNSocket &operator=(const CNSocket &cns);
 
 
     /**

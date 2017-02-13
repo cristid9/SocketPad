@@ -1,7 +1,3 @@
-//
-// Created by cristi on 24.01.17.
-//
-
 #include <cstring>
 #include "CNSocket.h"
 #include <glog/logging.h>
@@ -127,4 +123,13 @@ bool CNSocket::send_message(std::string msg) const
     if (status == 0)
         return false;
     return true;
+}
+
+CNSocket& CNSocket::operator=(const CNSocket &cns)
+{
+    sock = cns.sock;
+    sock_server = cns.sock_server;
+    sock_descriptor = cns.sock_descriptor;
+
+    return *this;
 }
