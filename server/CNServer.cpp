@@ -144,6 +144,10 @@ void CNServer::client_handler(CNSocket cnsock)
                 answer["room_id"] = file_id;
                 answer["action"] = "ROOM_EXISTS";
 
+                ContributorContainer ctb(User::get_id(db_name, initer), initer, cnsock);
+
+                rooms[file_id].add_contributor(ctb);
+
                 cnsock.send_message(answer.dump());
             }
             else
@@ -189,7 +193,8 @@ void CNServer::client_handler(CNSocket cnsock)
 
             rooms_mtx.lock();
 
-            rooms[file_id].propagate_change(session_user->get_id(), client_request.dump());
+            rooms[file_id].propagate_change(User::get_id(db_name, client_request["author"].get<std::string>()),
+                                            client_request.dump());
 
             rooms_mtx.unlock();
 

@@ -22,10 +22,20 @@ public:
 private slots:
     void on_textEdit_textChanged();
 
+    void on_pushButton_3_clicked();
+
 private:
     Ui::FileEdit *ui;
     QWidget *parent;
     std::string filename;
+    bool propagator;
+
+    /**
+     * @brief Messy workaround for sharing update informations between the worker thread
+     *        and the main thread.
+     */
+    std::string update_info;
+
     /**
      * @brief Stores the text displayed in the qedit box.
      */

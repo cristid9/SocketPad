@@ -16,6 +16,7 @@ FileEdit::FileEdit(QWidget *parent) :
 {
     ui->setupUi(this);
     this->parent = parent;
+    propagator = false;
 }
 
 void FileEdit::init_room()
@@ -79,6 +80,7 @@ void FileEdit::handle_room_logic()
 {
     init_room();
     load_room_file_data();
+    current_file_text = this->ui->textEdit->toPlainText().toUtf8().constData();
     std::thread background_handler(&FileEdit::client_handler, this);
 
     background_handler.detach();
@@ -111,23 +113,39 @@ void FileEdit::client_handler()
 void FileEdit::apply_change(FileChange change, std::string author)
 {
     std::string tmp_txt = current_file_text;
+    std::string tmp_update_info;
+
+
 
     switch (change.get_type())
     {
     case ChangeType::FILE_CHANGE_INSERT:
+        qInfo() << "[TEXT EDIT CHANGED] insert performed "
+                << change.get_pos() << " " << change.get_target();
+        tmp_update_info = "User: " + author + "performed insertion";
         tmp_txt.insert(change.get_pos(), 1, change.get_target());
-        this->ui->label_3->setText("User" + QString::fromStdString(author) + "performed insertion");
         break;
     case ChangeType::FILE_CHANGE_DELETE:
+        qInfo() << "[TEXT EDIT CHANGED] delete perfomed";
+        tmp_update_info = "User: " + author + "performed deletion";
         tmp_txt.erase(tmp_txt.begin() + change.get_pos());
         break;
     case ChangeType::FILE_CHANGE_REPLACE:
+        qInfo() << "[TEXT EDIT PERFORMED] replace perfomed";
+        tmp_update_info = "User: "  + author + "performed replace";
         tmp_txt[change.get_pos()] = change.get_target();
         break;
     }
 
-    this->ui->textEdit->setText(QString::fromStdString(tmp_txt));
     current_file_text = tmp_txt;
+    update_info = tmp_update_info;
+
+    qInfo() << "Now what"
+            << QString::fromStdString(current_file_text);
+
+    propagator = true;
+    emit this->ui->pushButton_3->click();
+
 }
 
 void FileEdit::set_filename(std::string fn)
@@ -142,6 +160,13 @@ FileEdit::~FileEdit()
 
 void FileEdit::on_textEdit_textChanged()
 {
+    if (propagator)
+    {
+        propagator = false;
+        return;
+    }
+    if (current_file_text == "") return;
+
     qInfo() << "[FILE EDIT] user has changed a character";
 
     std::string new_text = this->ui->textEdit->toPlainText().toUtf8().constData();
@@ -164,4 +189,11 @@ void FileEdit::on_textEdit_textChanged()
     request["author"] = sm.get_username();
 
     clsock.write_msg(request.dump());
+}
+
+
+void FileEdit::on_pushButton_3_clicked()
+{
+    qInfo() << "Jeeesus";
+    this->ui->textEdit->setText(QString::fromStdString(current_file_text));
 }

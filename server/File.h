@@ -110,6 +110,16 @@ public:
      * @brief Static method for retrieval of a file `id`.
      */
     static unsigned int get_id(std::string db_path, std::string filename, std::string author);
+
+    /**
+     * @brief Gets a filename by its id in db (security--).
+     */
+    static std::string get_filename(std::string db_path, unsigned int id);
+
+    /**
+     * @brief Gets the author of the file with this id.
+     */
+    static std::string get_author(std::string db_path, unsigned int id);
 };
 
 

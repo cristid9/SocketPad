@@ -123,3 +123,30 @@ std::string File::get_author() const
 {
     return author;
 }
+
+std::string File::get_filename(std::string db_path, unsigned int id)
+{
+    session sql(sqlite3, "dbname=" + db_path);
+
+    std::string filename;
+    sql << "SELECT name FROM File WHERE id=:id",
+        use(id), into(filename);
+
+    return filename;
+}
+
+std::string File::get_author(std::string db_path, unsigned int id)
+{
+    session sql(sqlite3, "dbname=" + db_path);
+
+    std::string author;
+
+    unsigned int author_id;
+
+    sql << "SELECT creator_id FROM File WHERE id=:id",
+        use(id), into(author_id);
+
+    author = User::get_username(db_path, author_id);
+
+    return author;
+}
