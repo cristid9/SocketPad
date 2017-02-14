@@ -133,3 +133,8 @@ CNSocket& CNSocket::operator=(const CNSocket &cns)
 
     return *this;
 }
+
+void CNSocket::finalize()
+{
+    close(sock_descriptor);
+}

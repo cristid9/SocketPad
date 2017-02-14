@@ -187,6 +187,8 @@ void FileEdit::on_textEdit_textChanged()
     request["position"] = fl_change.get_pos();
     request["target"] = fl_change.get_target();
     request["author"] = sm.get_username();
+    // tmp hack
+    request["new_text"] = new_text;
 
     clsock.write_msg(request.dump());
 }
@@ -194,6 +196,5 @@ void FileEdit::on_textEdit_textChanged()
 
 void FileEdit::on_pushButton_3_clicked()
 {
-    qInfo() << "Jeeesus";
     this->ui->textEdit->setText(QString::fromStdString(current_file_text));
 }

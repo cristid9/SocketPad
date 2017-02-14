@@ -27,6 +27,7 @@ private slots:
     void on_pushButton_2_clicked();
 
 private:
+    void closeEvent(QCloseEvent *bar);
     Ui::MainWindow *ui;
     RegiisterForm *registerForm;
     LoginForm *loginForm;

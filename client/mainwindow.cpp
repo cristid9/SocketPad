@@ -2,7 +2,11 @@
 #include "ui_mainwindow.h"
 #include "regiisterform.h"
 #include "global_objs.h"
+#include "json.hpp"
 #include <iostream>
+#include <QCloseEvent>
+
+using json = nlohmann::json;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -14,6 +18,14 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    json request = { {"action", "QUIT"} };
+
+    clsock.write_msg(request.dump());
+    event->accept();
 }
 
 void MainWindow::on_pushButton_clicked()

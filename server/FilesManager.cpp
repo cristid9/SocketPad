@@ -78,6 +78,16 @@ void FilesManager::add_user_directory(std::string username)
     mkdir(candidate_path.c_str(), 0700);
 }
 
+void FilesManager::update_content(std::string username, std::string filename, std::string value)
+{
+    std::string path = storage_path + "/" + username + "/" + filename;
+
+    std::ofstream inFile(path);
+
+    inFile << value;
+
+    inFile.close();
+}
 
 FilesManager::FilesManager()
 {

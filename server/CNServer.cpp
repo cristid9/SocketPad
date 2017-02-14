@@ -183,6 +183,8 @@ void CNServer::client_handler(CNSocket cnsock)
         else if (client_request["action"].get<std::string>() == "PEER_NOTIFY_FILE_CHANGE")
         {
             unsigned int file_id = client_request["file_id"].get<int>();
+            std::string file_author = File::get_author(db_name, file_id);
+            std::string file_name = File::get_filename(db_name, file_id);
 
             LOG(INFO) << "[ROOM ACCESS] Peer broadcasted change, author "
                       << session_user->get_username()
@@ -190,6 +192,9 @@ void CNServer::client_handler(CNSocket cnsock)
                       << file_id;
 
             client_request["action"] = "PEER_EDIT_PROPAGATION";
+
+            FilesManager::update_content(file_author, file_name,
+                                         client_request["new_text"].get<std::string>());
 
             rooms_mtx.lock();
 
@@ -230,6 +235,33 @@ void CNServer::client_handler(CNSocket cnsock)
             }
 
             rooms_mtx.unlock();
+        }
+        else if (client_request["action"].get<std::string>() == "QUIT")
+        {
+
+            if (session_user != nullptr)
+            {
+                LOG(INFO) << "[QUIT] User "
+                          << session_user->get_username()
+                          << " has quit ";
+
+                rooms_mtx.lock();
+
+                for (auto room : rooms)
+                {
+                    room.second.remove_contributor(session_user->get_id());
+                }
+
+                rooms_mtx.unlock();
+            }
+            else
+            {
+                LOG(INFO) << "[QUIT] Random client quit";
+
+            }
+            cnsock.finalize();
+
+            return;
         }
     }
 }

@@ -72,6 +72,11 @@ public:
      * @return The text of the targeted file.
      */
     static std::string load_file_text(std::string username, std::string filename);
+
+    /**
+     * @brief Writes the change made by an user to the disk.
+     */
+    static void update_content(std::string username, std::string filename, std::string value);
 };
 
 

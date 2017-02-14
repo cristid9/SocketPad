@@ -75,6 +75,11 @@ public:
      * @return True if the message was sent successfully, false otherwise.
      */
     bool send_message(std::string msg) const;
+
+    /**
+     * @brief Closes the socket.
+     */
+    void finalize();
 };
 
 
