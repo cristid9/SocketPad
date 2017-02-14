@@ -12,13 +12,18 @@
 #include "FilesManager.h"
 #include "FileEditRoom.h"
 #include <map>
+#include <mutex>
 
 class CNServer {
 private:
     static const int server_port = 3131;
     static const long server_addr = INADDR_ANY;
 
-    void client_handler(CNSocket cnsock, std::map<unsigned int, FileEditRoom>);
+    std::mutex rooms_mtx;
+    // pairs of the form <file_id: room-related data>
+    std::map<unsigned int, FileEditRoom> rooms;
+
+    void client_handler(CNSocket cnsock);
 
 public:
 

@@ -6,6 +6,7 @@
 #include "FileEditRoom.h"
 #include <glog/logging.h>
 #include <map>
+#include <mutex>
 
 // Replace with calls to the Helper
 const std::string db_name = "/home/cristi/computer_networks/colaborative_notepad/server/db/cn.sql";
@@ -15,8 +16,6 @@ using json = nlohmann::json;
 void CNServer::start_server()
 {
 
-    // pairs of the form <file_id: room-related data>
-    std::map<unsigned int, FileEditRoom> rooms;
     CNSocket sock(server_port, server_addr);
     sock.cnlisten();
 
@@ -24,12 +23,12 @@ void CNServer::start_server()
     {
         CNSocket cnclient = sock.cnaccept();
 
-        std::thread client_thread(&CNServer::client_handler, this, cnclient, rooms);
+        std::thread client_thread(&CNServer::client_handler, this, cnclient);
         client_thread.detach();
     }
  }
 
-void CNServer::client_handler(CNSocket cnsock, std::map<unsigned int, FileEditRoom> rooms)
+void CNServer::client_handler(CNSocket cnsock)
 {
     LOG(INFO) << "Waiting for a message from a client";
 
@@ -137,6 +136,7 @@ void CNServer::client_handler(CNSocket cnsock, std::map<unsigned int, FileEditRo
             std::string initer = client_request["username"].get<std::string>();
             unsigned int file_id = File::get_id(db_name, filename, author);
 
+            rooms_mtx.lock();
             if (rooms.find(file_id) != rooms.end())
             {
                 // return the id of the existing room
@@ -151,6 +151,7 @@ void CNServer::client_handler(CNSocket cnsock, std::map<unsigned int, FileEditRo
                 // create the room
                 ContributorContainer ctb(User::get_id(db_name, initer), initer, cnsock);
 
+
                 rooms[file_id] = FileEditRoom(filename, file_id);
                 rooms[file_id].add_contributor(ctb);
 
@@ -160,6 +161,7 @@ void CNServer::client_handler(CNSocket cnsock, std::map<unsigned int, FileEditRo
 
                 cnsock.send_message(answer.dump());
             }
+            rooms_mtx.unlock();
         }
         else if (client_request["action"].get<std::string>() == "GET_FILE_TEXT")
         {
@@ -183,9 +185,46 @@ void CNServer::client_handler(CNSocket cnsock, std::map<unsigned int, FileEditRo
                       << " targeted file "
                       << file_id;
 
-            json answer = client_request;
-            answer["action"] = "PEER_EDIT_PROPAGATION";
-            rooms[file_id].propagate_change(session_user->get_id(), answer.dump());
+            client_request["action"] = "PEER_EDIT_PROPAGATION";
+
+            rooms_mtx.lock();
+
+            rooms[file_id].propagate_change(session_user->get_id(), client_request.dump());
+
+            rooms_mtx.unlock();
+
+            // don't forget to write changes on the disk
+        }
+        else if (client_request["action"].get<std::string>() == "JOIN_ROOM_INTENT")
+        {
+            LOG(INFO) << "[ROOM ACCESS] detected room join intent";
+
+            // add a lock to rooms, in plm
+
+            unsigned int file_id = client_request["file_id"].get<int>();
+
+            rooms_mtx.lock();
+
+            if (rooms.find(file_id) == rooms.end())
+            {
+                json answer;
+                answer["action"] = "ROOM_DOES_NOT_EXIST";
+                cnsock.send_message(answer.dump());
+            }
+            else
+            {
+                std::string filename = File::get_filename(db_name, file_id);
+                std::string author = File::get_author(db_name, file_id);
+
+                json answer;
+                answer["action"] = "ROOM_JOIN_INTENT_OK";
+                answer["filename"] = filename;
+                answer["author"] = author;
+
+                cnsock.send_message(answer.dump());
+            }
+
+            rooms_mtx.unlock();
         }
     }
 }
