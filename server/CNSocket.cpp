@@ -93,7 +93,7 @@ std::string CNSocket::get_message() const
               << message_size;
 
     // move dynamic allocation
-    char content[1000];
+    char content[100000];
     if (read(sock_descriptor, content, message_size) < 0)
     {
         LOG(ERROR) << "[Sys call failure] Failed to read the content of the message";

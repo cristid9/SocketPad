@@ -14,8 +14,6 @@ int main(int argc, char** argv)
 
     InitGoogleLogging(argv[0]);
 
-    // you could rely on the env var on the future
-    // ...just sayin'
     FLAGS_logtostderr = 1;
 
     LOG(INFO) << "Server started";

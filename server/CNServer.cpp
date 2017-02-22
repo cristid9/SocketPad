@@ -121,6 +121,9 @@ void CNServer::client_handler(CNSocket cnsock)
                 std::string pth = FilesManager::create_empty_file(session_user->get_username(),
                                                                   client_request["filename"].get<std::string>());
 
+                FilesManager::update_content(session_user->get_username(),
+                                             client_request["filename"].get<std::string>(), " ");
+
                 File::create(db_name, session_user,
                              client_request["filename"].get<std::string>(), pth);
 
@@ -208,8 +211,6 @@ void CNServer::client_handler(CNSocket cnsock)
         else if (client_request["action"].get<std::string>() == "JOIN_ROOM_INTENT")
         {
             LOG(INFO) << "[ROOM ACCESS] detected room join intent";
-
-            // add a lock to rooms, in plm
 
             unsigned int file_id = client_request["file_id"].get<int>();
 

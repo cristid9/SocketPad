@@ -7,6 +7,7 @@
 #include <QDir>
 #include <QInputDialog>
 #include <QDebug>
+#include <fstream>
 
 using json = nlohmann::json;
 
@@ -16,6 +17,8 @@ UserPanel::UserPanel(QWidget *parent) :
 {
     ui->setupUi(this);
     this->parent = parent;
+
+    this->ui->label->setText(QString::fromStdString("User: " + sm.get_username() + "'sst"));
 
     load_files();
 }
@@ -147,4 +150,32 @@ void UserPanel::on_pushButton_4_clicked()
         this->ui->pushButton_4->hide();
 
     }
+}
+
+void UserPanel::on_pushButton_clicked()
+{
+
+    QStringList strList = this->ui->listView->model()->index(
+        this->ui->listView->selectionModel()->currentIndex().row(), 0)
+    .data(Qt::DisplayRole).toString().split("/");
+
+    std::string author = strList.value(0).toUtf8().constData();
+    std::string filename =strList.value(1).toUtf8().constData();
+
+    json request;
+    request["action"] = "GET_FILE_TEXT";
+    request["author"] = author.c_str();
+    request["filename"] = filename.c_str();
+
+    clsock.write_msg(request.dump());
+
+    json answer = json::parse(clsock.read_msg());
+
+    std::ofstream outFile("/home/cristi/Desktop/" + author + "_" + filename + ".txt");
+    outFile << answer["text"].get<std::string>();
+    outFile.close();
+
+    Mbox = new QMessageBox();
+    Mbox->setText("File downloaded successfully");
+    Mbox->show();
 }

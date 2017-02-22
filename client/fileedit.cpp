@@ -7,6 +7,8 @@
 #include <QDebug>
 #include <sstream>
 #include <thread>
+#include <fstream>
+#include <algorithm>
 
 using json = nlohmann::json;
 
@@ -21,6 +23,8 @@ FileEdit::FileEdit(QWidget *parent) :
 
 void FileEdit::init_room()
 {
+    this->setWindowTitle(QString::fromStdString(filename));
+
     QString split_container = QString::fromStdString(filename);
 
     QStringList parts = split_container.split("/");
@@ -122,17 +126,17 @@ void FileEdit::apply_change(FileChange change, std::string author)
     case ChangeType::FILE_CHANGE_INSERT:
         qInfo() << "[TEXT EDIT CHANGED] insert performed "
                 << change.get_pos() << " " << change.get_target();
-        tmp_update_info = "User: " + author + "performed insertion";
+        tmp_update_info = "User:  " + author + " performed insertion";
         tmp_txt.insert(change.get_pos(), 1, change.get_target());
         break;
     case ChangeType::FILE_CHANGE_DELETE:
         qInfo() << "[TEXT EDIT CHANGED] delete perfomed";
-        tmp_update_info = "User: " + author + "performed deletion";
+        tmp_update_info = "User: " + author + " performed deletion";
         tmp_txt.erase(tmp_txt.begin() + change.get_pos());
         break;
     case ChangeType::FILE_CHANGE_REPLACE:
         qInfo() << "[TEXT EDIT PERFORMED] replace perfomed";
-        tmp_update_info = "User: "  + author + "performed replace";
+        tmp_update_info = "User: "  + author + " performed replace";
         tmp_txt[change.get_pos()] = change.get_target();
         break;
     }
@@ -197,4 +201,21 @@ void FileEdit::on_textEdit_textChanged()
 void FileEdit::on_pushButton_3_clicked()
 {
     this->ui->textEdit->setText(QString::fromStdString(current_file_text));
+    this->ui->label->setText(QString::fromStdString(update_info));
+}
+
+void FileEdit::on_pushButton_2_clicked()
+{
+    // Not a good idea to harcode the path, but I am running out of time
+
+    std::string download_name = filename;
+    std::replace(download_name.begin(), download_name.end(), '/', '_');
+
+    std::ofstream outFile("/home/cristi/Desktop/" + download_name + ".txt");
+    outFile << this->ui->textEdit->toPlainText().toUtf8().constData();
+    outFile.close();
+
+    Mbox = new QMessageBox();
+    Mbox->setText("File Saved successfully");
+    Mbox->show();
 }
